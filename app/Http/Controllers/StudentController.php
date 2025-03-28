@@ -11,7 +11,7 @@ class StudentController extends Controller
     public function index()
     {
         $students = Student::all(); // Later: add filtering logic
-        return view('index', compact('students'));
+        return view('students.index', compact('students'));
     }
 
     // Show the form to create a new student
@@ -19,6 +19,29 @@ class StudentController extends Controller
     {
         return view('create');
     }
+    public function search(Request $request)
+    {
+        $query = $request->input('query');
+        $minAge = $request->input('min_age');
+        $maxAge = $request->input('max_age');
+
+        $students = Student::query();
+            if (!empty($query)) {
+            $students->where('name', 'LIKE', "%{$query}%");
+        }
+            if (!empty($minAge)) {
+            $students->where('age', '>=', $minAge);
+        }
+        if (!empty($maxAge)) {
+            $students->where('age', '<=', $maxAge);
+        }
+            $students = $students->get();
+            if ($request->ajax()) {
+            return view('students.student_table', compact('students'))->render();
+        }
+            return view('students.index', compact('students'));
+    }
+
 
     // Store a newly created student
     public function store(Request $request)
@@ -41,3 +64,4 @@ class StudentController extends Controller
     public function update(Request $request, $id) {}
     public function destroy($id) {}
 }
+//sabah ajlouni #20230130
